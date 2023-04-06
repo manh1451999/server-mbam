@@ -36,13 +36,13 @@ app.use(express.static('public'))
 
 
 app.use(cors({
-    // origin: 'http://127.0.0.1:5500', //Chan tat ca cac domain khac ngoai domain nay
-    credentials: true //Để bật cookie HTTP qua CORS
+  // origin: 'http://127.0.0.1:5500', //Chan tat ca cac domain khac ngoai domain nay
+  credentials: true //Để bật cookie HTTP qua CORS
 }))
 
 
 app.get('/', function (req, res) {
-    res.json("server mbam")
+  res.json("server mbam")
 })
 
 app.use('/proxy', authMiddleware.isAuth, proxyFreeRouters);
@@ -51,6 +51,7 @@ app.use('/mail', mailRouters);
 
 
 app.listen(port, () => console.log('Server is listening on port ' + port))
-https.createServer(options, app).listen(5050, () => {
-    console.log(`HTTPS server started on port 5050`);
-  });
+const env = process.env.NODE_ENV || 'development';
+if (env == 'development') https.createServer(options, app).listen(5050, () => {
+  console.log(`HTTPS server started on port 5050`);
+});
