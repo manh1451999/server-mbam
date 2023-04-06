@@ -25,7 +25,7 @@ var mailRouters = require('./routes/mail.route')
 
 
 var app = express()
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 8080;
 
 
 app.use(bodyParser.json()) // for parsing application/json
@@ -52,6 +52,6 @@ app.use('/mail', mailRouters);
 
 app.listen(port, () => console.log('Server is listening on port ' + port))
 const env = process.env.NODE_ENV || 'development';
-if (env == 'development') https.createServer(options, app).listen(5050, () => {
-  console.log(`HTTPS server started on port 5050`);
+if (env == 'development') https.createServer(options, app).listen(8000, () => {
+  console.log(`HTTPS server started on port 8000`);
 });
