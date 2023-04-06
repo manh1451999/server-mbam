@@ -45,7 +45,7 @@ module.exports.getEmails = (options) => {
                         console.log('set flag Seen')
                         resolve(code);
                       });
-                    } else reject("code not found");
+                    } else reject("code not Deleted");
                   });
                 });
                 // msg.once("attributes", (attrs) => {
@@ -107,20 +107,7 @@ module.exports.checkLive = (options) => {
       let code = null;
       imap.once("ready", () => {
         imap.openBox("INBOX", false, () => {
-          imap.search(
-            [
-              "ALL",
-              ["SINCE", dayjs().subtract(1, "day").format("MMMM DD,YYYY")],
-              ["SUBJECT", "Confirm your new email"],
-              ["FROM", "accounts@malwarebytes.com"],
-            ],
-            (err, results) => {
-              if (err) reject(err);
-              const uid = results?.reverse()?.[0];
-              if (!uid) reject("mail not found");
-              else resolve(null)
-            }
-          );
+          resolve(null)
         });
       });
 
