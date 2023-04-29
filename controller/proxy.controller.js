@@ -2,18 +2,6 @@ let controller = {}
 let file = require('../utils/writeFile.js')
 let request = require('../utils/getProxy.js')
 const pathIpvanish = 'public/proxies/ipvanish.txt'
-const axios = require('axios');
-const { apiProxyScaperHttps,
-	apiProxyScaperSocks4,
-	apiProxyScaperSocks5,
-	apiProxyggHttps,
-	apiProxyggSocks4,
-	apiProxyggSocks5,
-	apiProxyscanioHttps,
-	apiProxyscanioSocks4,
-	apiProxyscanioSocks5
-
-} = require('../constants/api.js');
 
 let FULL_LINK = {
 	JUPROXY: {
@@ -65,7 +53,6 @@ let FULL_LINK = {
 		'socks4': ["https://openproxylist.xyz/socks4.txt"],
 		'socks5': ["https://openproxylist.xyz/socks5.txt"],
 	}
-	
 }
 
 // FULL_LINK.CUSTOM = {
@@ -79,6 +66,7 @@ controller.test = async (req, res) => {
 		message: "success",
 	})
 }
+
 
 controller.ipvanish = async (req, res) => {
 	let listIpv = file.read(pathIpvanish)
@@ -105,7 +93,7 @@ controller.custom = async (req, res) => {
 	return res.status(200).send(proxies)
 }
 
-controller.getLink = async (req, res) => {
+controller.getlink = async (req, res) => {
 	return res.status(200).send(FULL_LINK)
 }
 

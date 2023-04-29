@@ -6,6 +6,7 @@ router.get('/test', proxyController.test)
 router.get('/ipvanish', proxyController.ipvanish)
 router.get('/juproxy', proxyController.juproxy)
 router.get('/custom', proxyController.custom)
+router.get('/getlink', proxyController.getlink)
 
 
 module.exports = router;
