@@ -13,7 +13,8 @@ var authMiddleware = require('./middleware/auth.middleware')
 
 
 var proxyFreeRouters = require('./routes/proxy.route')
-var mailRouters = require('./routes/mail.route')
+var mailRouters = require('./routes/mail.route');
+const { default: axios } = require('axios');
 
 
 
@@ -37,6 +38,15 @@ app.use(cors({
 
 app.get('/', function (req, res) {
   res.json("server mbam")
+})
+
+app.get('/checkip', async function(req, res){
+  try{
+    const response = await axios.get('http://ip-api.com/json')
+    return res.status(200).send(response?.data)
+  }catch(err){
+    return res.status(400).send(err)
+  }
 })
 
 // app.use('/proxy', authMiddleware.isAuth, proxyFreeRouters);
