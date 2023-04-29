@@ -4,12 +4,6 @@ var bodyParser = require('body-parser')
 // var cookieParser = require('cookie-parser')
 const cors = require('cors');
 
-const https = require("https");
-const fs = require("fs-extra");
-const options = {
-  key: fs.readFileSync("./https/cert.key"),
-  cert: fs.readFileSync("./https/cert.crt"),
-};
 
 var authMiddleware = require('./middleware/auth.middleware')
 
@@ -53,6 +47,15 @@ app.use('/mail', mailRouters);
 
 app.listen(port, () => console.log('Server is listening on port ' + port))
 const env = process.env.NODE_ENV || 'development';
-if (env == 'development') https.createServer(options, app).listen(8000, () => {
-  console.log(`HTTPS server started on port 8000`);
-});
+if (env == 'development') {
+
+  const https = require("https");
+  const fs = require("fs-extra");
+  const options = {
+    key: fs.readFileSync("./https/cert.key"),
+    cert: fs.readFileSync("./https/cert.crt"),
+  };
+  https.createServer(options, app).listen(8000, () => {
+    console.log(`HTTPS server started on port 8000`);
+  });
+} 
