@@ -4,9 +4,8 @@ let proxyController = require('../controller/proxy.controller')
 
 router.get('/test', proxyController.test)
 router.get('/ipvanish', proxyController.ipvanish)
-router.get('/https', proxyController.https)
-router.get('/socks4', proxyController.socks4)
-router.get('/socks5', proxyController.socks5)
+router.get('/juproxy', proxyController.juproxy)
+router.get('/custom', proxyController.custom)
 
 
 module.exports = router;

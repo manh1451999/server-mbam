@@ -45,7 +45,8 @@ app.get('/', function (req, res) {
   res.json("server mbam")
 })
 
-app.use('/proxy', authMiddleware.isAuth, proxyFreeRouters);
+// app.use('/proxy', authMiddleware.isAuth, proxyFreeRouters);
+app.use('/proxy',proxyFreeRouters);
 app.use('/mail', mailRouters);
 
 
