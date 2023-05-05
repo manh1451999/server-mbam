@@ -12,7 +12,6 @@ controller.getRequestProxy= async(api)=>{
 
 	}
 	catch(err){
-		console.log(err)
 		return []
 	}
 }
@@ -26,7 +25,6 @@ controller.get = async(apis=[])=>{
 		return result || []
 	}
 	catch(err){
-		console.log(err)
 		return []
 	}
 }
