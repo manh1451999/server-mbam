@@ -67,14 +67,14 @@ const getProxy = async (category, type) =>{
 	const key = `${categoryFormated}---${type}`
 	let proxies = getCache(key)
 	if(proxies) {
-		console.log(`Cache ===> get ${proxies.length} from ${key}`)
+		console.log(`Cache ===> get ${proxies.split('\n').length} from ${key}`)
 		return proxies
 	}
 	const links = FULL_LINK?.[categoryFormated]?.[type]
 	if (!links) throw Error("không có link phù hợp");
  	proxies = await request.get(links)
-	proxies = (proxies || []).join(`\n`)
 	console.log(`get ${proxies.length} from  ${key}`)
+	proxies = (proxies || []).join(`\n`)
 	setCache(key, proxies)
 	return proxies
 }
