@@ -62,11 +62,11 @@ let FULL_LINK = {
 // 	'socks5': ["CUSTOMER"],
 // }
 
-const getProxy = async (category, type) =>{
+const getProxy = async (category, type, useCache= true) =>{
 	categoryFormated = category?.toString()?.toUpperCase()
 	const key = `${categoryFormated}---${type}`
 	let proxies = getCache(key)
-	if(proxies) {
+	if(proxies && useCache) {
 		console.log(`Cache ===> get ${proxies.split('\n').length} from ${key}`)
 		return proxies
 	}

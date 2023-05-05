@@ -1,4 +1,4 @@
-const cron = require('node-cron');
+const cron = require('node-cron', false);
 const { getProxy } = require('../controller/proxy.controller');
 
 const sleep = (minutes)=>{
@@ -9,13 +9,13 @@ const sleep = (minutes)=>{
   })
 }
 const getProxyCache = async () => {
-  await getProxy('JUPROXY', 'http')
+  await getProxy('JUPROXY', 'http', false)
   await sleep(1)
-  await getProxy('JUPROXY', 'https')
+  await getProxy('JUPROXY', 'https', false)
   await sleep(1)
-  await getProxy('JUPROXY', 'socks4')
+  await getProxy('JUPROXY', 'socks4', false)
   await sleep(1)
-  await getProxy('JUPROXY', 'socks5')
+  await getProxy('JUPROXY', 'socks5', false)
 }
 proxyCron = () => {
   
