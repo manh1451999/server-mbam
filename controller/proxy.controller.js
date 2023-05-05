@@ -1,6 +1,7 @@
 let controller = {}
 let file = require('../utils/writeFile.js')
 let request = require('../utils/getProxy.js')
+const { getCache, setCache } = require('../utils/cache.js')
 const pathIpvanish = 'public/proxies/ipvanish.txt'
 
 let FULL_LINK = {
@@ -61,6 +62,25 @@ let FULL_LINK = {
 // 	'socks5': ["CUSTOMER"],
 // }
 
+const getProxy = async (category, type) =>{
+	categoryFormated = category?.toString()?.toUpperCase()
+	const key = `${categoryFormated}---${type}`
+	let proxies = getCache(key)
+	if(proxies) {
+		console.log(`Cache ===> get ${proxies.length} from ${key}`)
+		return proxies
+	}
+	const links = FULL_LINK?.[categoryFormated]?.[type]
+	if (!links) throw Error("không có link phù hợp");
+ 	proxies = await request.get(links)
+	proxies = (proxies || []).join(`\n`)
+	console.log(`get ${proxies.length} from  ${key}`)
+	setCache(key, proxies)
+	return proxies
+}
+
+controller.getProxy = getProxy
+
 controller.test = async (req, res) => {
 	return res.status(200).json({
 		message: "success",
@@ -76,20 +96,13 @@ controller.ipvanish = async (req, res) => {
 
 controller.juproxy = async (req, res) => {
 	const { type } = req.query
-	const links = FULL_LINK.JUPROXY?.[type]
-	if (!links) return res.status(400).send("không có link phù hợp")
-	let proxies = await request.get(links)
-	proxies = (proxies || []).join(`\n`)
+	const proxies = await getProxy('JUPROXY', type)
 	return res.status(200).send(proxies)
 }
 
 controller.custom = async (req, res) => {
 	let { type, category } = req.query
-	category = category?.toString()?.toUpperCase()
-	const links = FULL_LINK?.[category]?.[type]
-	if (!links) return res.status(400).send("không có link phù hợp")
-	let proxies = await request.get(links)
-	proxies = (proxies || []).join(`\n`)
+	const proxies = await getProxy(category, type)
 	return res.status(200).send(proxies)
 }
 
