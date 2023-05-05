@@ -9,13 +9,13 @@ const sleep = (minutes)=>{
   })
 }
 const getProxyCache = async () => {
-  await getProxy('PROXY_SCAPPER', 'http')
+  await getProxy('JUPROXY', 'http')
   await sleep(1)
-  await getProxy('PROXY_SCAPPER', 'https')
+  await getProxy('JUPROXY', 'https')
   await sleep(1)
-  await getProxy('PROXY_SCAPPER', 'socks4')
+  await getProxy('JUPROXY', 'socks4')
   await sleep(1)
-  await getProxy('PROXY_SCAPPER', 'socks5')
+  await getProxy('JUPROXY', 'socks5')
 }
 proxyCron = () => {
   
