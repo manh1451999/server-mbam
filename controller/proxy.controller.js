@@ -65,15 +65,15 @@ let FULL_LINK = {
 const getProxy = async (category, type, useCache= true) =>{
 	categoryFormated = category?.toString()?.toUpperCase()
 	const key = `${categoryFormated}---${type}`
-	let proxies = getCache(key)
-	if(proxies && useCache) {
-		// console.log(`Cache ===> get ${proxies.split('\n').length} from ${key}`)
-		return proxies
-	}
+	let proxiesCache = getCache(key)
 	const links = FULL_LINK?.[categoryFormated]?.[type]
 	if (!links) throw Error("không có link phù hợp");
  	proxies = await request.get(links)
 	// console.log(`get ${proxies.length} from  ${key}`)
+	if(proxiesCache && useCache && (proxies.length == 0)) {
+		// console.log(`Cache ===> get ${proxies.split('\n').length} from ${key}`)
+		return proxiesCache
+	}
 	proxies = (proxies || []).join(`\n`)
 	setCache(key, proxies)
 	return proxies
