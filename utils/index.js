@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const { LIST_RANDOM_NAME } = require('../constants/random');
+const chalk = require('chalk')
 
 const getRandomInt = (start = 0, end = 9) => {
     min = Math.ceil(start);
@@ -7,6 +8,16 @@ const getRandomInt = (start = 0, end = 9) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+module.exports.logBad = (str) => {
+    this.dead = console.log(chalk.hex('#D32F2F')(str));
+}
+module.exports.logSuccess = (str) => {
+    this.dead = console.log(chalk.hex('#388E3C')(str));
+}
+
+module.exports.numberWithCommas = (number, commas='.') =>{
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, commas);
+}
 
 module.exports.getNameRandom = () => {
     let max = LIST_RANDOM_NAME.length - 1

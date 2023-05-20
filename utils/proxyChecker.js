@@ -1,18 +1,9 @@
 const ProxyAgent = require('proxy-agent')
 const request = require('request')
-const chalk = require('chalk')
 const path = require('path')
 const fs = require('fs-extra');
-const { TIMEOUT, BOT } = require('./config/proxyChecker');
-const { logSuccess, logBad } = require('./utils');
-const args = process.argv.splice(2)
-const proxiesPlainText = fs.readFileSync(args[0], 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
-var proxies = proxiesPlainText.map(item => ({
-    proxy: item,
-    type: 'http'
-}))
-//Return usage on lower then required argv length
-if (args.length < 1) return console.log(`Usage: node ${path.basename(__filename)} {proxies.txt} {timeout}`);
+const { TIMEOUT, BOT } = require('../config/proxyChecker');
+const { logSuccess, logBad } = require('.');
 
 class ProxyChecker {
     constructor(proxies, options) {
@@ -41,7 +32,7 @@ class ProxyChecker {
             this.resolve = resolve
             this.reject = reject
             for (let i = 0; i < this.bot; i++) {
-                this.check(proxies[i])
+                this.check(this.proxies[i])
             }
         })
     }
@@ -66,6 +57,9 @@ class ProxyChecker {
 
         // this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
         console.clear()
+        process.stdout.write(
+            false ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc'
+        );
         logSuccess('\nTOTAL WORKING: ' + this.working);
         logSuccess('HTTP: ' + this.http);
         logSuccess('SOCKS5: ' + this.socks5);
@@ -78,7 +72,7 @@ class ProxyChecker {
         if (this.finished >= this.totalProxy) {
             // console.log(chalk.hex('#388E3C')('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
             logSuccess('DONE !');
-            this.resolve()
+            this.resolve(null)
         }
     }
 
@@ -96,7 +90,7 @@ class ProxyChecker {
 
     check(proxyObject) {
         // console.log('proxyObject', proxyObject)
-        const { type: proxy_type, proxy = [] } = proxyObject
+        const { type: proxy_type, proxy } = proxyObject
         const options = {
             uri: 'http://example.com',
             method: 'GET',
@@ -126,13 +120,7 @@ class ProxyChecker {
 
     }
 }
-const main = async () => {
-    const options = {
-        timeout: 3000,
-        bot: 50
-    }
-    const checker = new ProxyChecker(proxies, options);
-    await checker.start()
-    checker.saveToFile()
+
+module.exports = {
+    ProxyChecker
 }
-main()

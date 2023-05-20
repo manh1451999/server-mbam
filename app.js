@@ -15,7 +15,7 @@ var authMiddleware = require('./middleware/auth.middleware')
 var proxyFreeRouters = require('./routes/proxy.route')
 var mailRouters = require('./routes/mail.route');
 const { default: axios } = require('axios');
-// const { proxyCron } = require('./cron/proxy.cron');
+const { proxyCron } = require('./cron/proxy.cron');
 
 
 
@@ -54,9 +54,6 @@ app.get('/checkip', async function(req, res){
 app.use('/proxy',proxyFreeRouters);
 app.use('/mail', mailRouters);
 
-// proxyCron()
-
-
 app.listen(port, () => console.log('Server is listening on port ' + port))
 const env = process.env.NODE_ENV || 'development';
 if (env == 'development') {
@@ -71,3 +68,5 @@ if (env == 'development') {
     console.log(`HTTPS server started on port 8000`);
   });
 } 
+
+proxyCron()
