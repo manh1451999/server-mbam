@@ -46,7 +46,7 @@ const checkProxy = async () => {
   console.log(`\n`)
   const options = {
     timeout: 3000,
-    bot: 70
+    bot: 50
   }
   const proxies = [...http, ...socks4, ...socks5]
   const checker = new ProxyChecker(proxies, options);
