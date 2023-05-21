@@ -63,9 +63,9 @@ const mergeLink = (type, listSite = []) => {
 
 FULL_LINK.AUTO_CHECK = {
     'http': mergeLink('http', ['PROXY_SCAPPER']),
-    'https': mergeLink('https', ['PROXY_SCAPPER']),
-    'socks4': mergeLink('socks4', ['PROXY_SCAPPER']),
-    'socks5': mergeLink('socks5', ['PROXY_SCAPPER']),
+    'https':[],
+    'socks4': [],
+    'socks5': [],
 }
 module.exports = {
     FULL_LINK
