@@ -54,11 +54,15 @@ const mergeLink = (type, listSite = []) => {
     return listSite.map(site => FULL_LINK?.[site]?.[type]).filter(Boolean).flat()
 }
 
+// FULL_LINK.AUTO_CHECK = {
+//     'http': mergeLink('http', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+//     'https': mergeLink('https', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+//     'socks4': mergeLink('socks4', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+//     'socks5': mergeLink('socks5', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+// }
+
 FULL_LINK.AUTO_CHECK = {
-    'http': mergeLink('http', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'https': mergeLink('https', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks4': mergeLink('socks4', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks5': mergeLink('socks5', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+    'http': mergeLink('http', ['PROXY_SCAPPER']),
 }
 module.exports = {
     FULL_LINK
