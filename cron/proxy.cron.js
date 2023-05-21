@@ -52,6 +52,7 @@ const checkProxy = async () => {
   const checker = new ProxyChecker(proxies, options);
   await checker.start()
   checker.saveToFile()
+  autoPushProxyGit()
 }
 
 proxyCron = () => {
@@ -60,8 +61,8 @@ proxyCron = () => {
   //   getProxyCache()
   // });
 
-  autoPushProxyGit()
-  // checkProxy()
+  // autoPushProxyGit()
+  checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()
   });
