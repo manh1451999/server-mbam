@@ -1,6 +1,7 @@
 const cron = require('node-cron', false);
 const { getProxy } = require('../controller/proxy.controller');
 const { numberWithCommas } = require('../utils');
+const { autoPushProxyGit } = require('../utils/git');
 const { ProxyChecker } = require('../utils/proxyChecker');
 
 const sleep = (minutes) => {
@@ -59,6 +60,7 @@ proxyCron = () => {
   //   getProxyCache()
   // });
 
+  autoPushProxyGit()
   // checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()

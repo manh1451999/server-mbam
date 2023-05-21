@@ -14,6 +14,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
+    "chalk": "^3.0.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.7",
@@ -25,9 +26,9 @@
     "jsonwebtoken": "^9.0.0",
     "lru-cache": "^9.1.1",
     "mailparser": "^3.6.4",
+    "node-cmd": "^5.0.0",
     "node-cron": "^3.0.2",
     "nodemon": "^2.0.7",
-    "chalk": "^3.0.0",
     "proxy-agent": "^3.1.1",
     "request": "^2.88.2"
   }
