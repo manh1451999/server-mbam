@@ -47,13 +47,13 @@ class ProxyChecker {
     }
 
 
-    // title(text) {
-    //     if (process.platform === 'win32') {
-    //         process.title = text;
-    //     } else {
-    //         process.stdout.write('\x1b]2;' + text + '\x1b\x5c');
-    //     }
-    // }
+    title(text) {
+        if (process.platform === 'win32') {
+            process.title = text;
+        } else {
+            process.stdout.write('\x1b]2;' + text + '\x1b\x5c');
+        }
+    }
 
     updateStatus(working, not_working, proxy_type) {
         this.working += working;
@@ -64,7 +64,7 @@ class ProxyChecker {
 
         this.finished = this.not_working + this.working;
 
-        // this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
+        this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
         console.clear()
         logSuccess('\nTOTAL WORKING: ' + this.working);
         logSuccess('HTTP: ' + this.http);
@@ -96,20 +96,38 @@ class ProxyChecker {
 
     check(proxyObject) {
         // console.log('proxyObject', proxyObject)
+        if (!proxyObject) return;
         const { type: proxy_type, proxy = [] } = proxyObject
+        // const options = {
+        //     uri: 'http://example.com',
+        //     method: 'GET',
+        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
+        //     timeout: Number(this.timeout)
+        // };
+
         const options = {
-            uri: 'http://example.com',
-            method: 'GET',
+            uri: 'https://my-sso.malwarebytes.com/auth',
+            method: 'POST',
             agent: new ProxyAgent(proxy_type + '://' + proxy),
-            timeout: Number(this.timeout)
+            timeout: Number(this.timeout),
+            headers: {
+                'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
+                'Connection': 'Keep-Alive',
+                'Accept-Language': 'en-US,*',
+                'Content-Type': 'application/json',
+            },
+            json: {
+                "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
+            }
         };
 
-        request.get(options, (error, response) => {
+        request.post(options, (error, response) => {
+            let statusCode = response?.statusCode
             if (error) {
                 // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
-            else if (response.body.includes('Example')) {
+            else if (statusCode == 201|| statusCode == 429 ) {
                 // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
                 this.updateStatus(1, 0, proxy_type)
                 this.proxiesSuccess.push(proxyObject)
@@ -117,6 +135,7 @@ class ProxyChecker {
                 // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
+            console.log('statusCode', statusCode)
 
             if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
             return
@@ -129,7 +148,7 @@ class ProxyChecker {
 const main = async () => {
     const options = {
         timeout: 4000,
-        bot: 20
+        bot: 40
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()
