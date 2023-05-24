@@ -91,55 +91,19 @@ class ProxyChecker {
     check(proxyObject) {
         // console.log('proxyObject', proxyObject)
         const { type: proxy_type, proxy } = proxyObject
-        // const options = {
-        //     uri: 'http://example.com',
-        //     method: 'GET',
-        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
-        //     timeout: Number(this.timeout)
-        // };
-
-        // request.get(options, (error, response) => {
-        //     if (error) {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
-        //     else if (response.body.includes('Example')) {
-        //         // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
-        //         this.updateStatus(1, 0, proxy_type)
-        //         this.proxiesSuccess.push(proxyObject)
-        //     } else {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
-
-        //     if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
-        //     return
-        // });
-
-        
         const options = {
-            uri: 'https://my-sso.malwarebytes.com/auth',
-            method: 'POST',
+            uri: 'http://example.com',
+            method: 'GET',
             agent: new ProxyAgent(proxy_type + '://' + proxy),
-            timeout: Number(this.timeout),
-            headers: {
-                'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
-                'Connection': 'Keep-Alive',
-                'Accept-Language': 'en-US,*',
-                'Content-Type': 'application/json',
-            },
-            json: {
-                "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
-            }
+            timeout: Number(this.timeout)
         };
 
-        request.post(options, (error, response) => {
-            let statusCode = response?.statusCode
+        request.get(options, (error, response) => {
             if (error) {
                 // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
-            else if (statusCode == 201|| statusCode == 429 ) {
+            else if (response.body.includes('Example')) {
                 // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
                 this.updateStatus(1, 0, proxy_type)
                 this.proxiesSuccess.push(proxyObject)
@@ -151,6 +115,42 @@ class ProxyChecker {
             if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
             return
         });
+
+        
+        // const options = {
+        //     uri: 'https://my-sso.malwarebytes.com/auth',
+        //     method: 'POST',
+        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
+        //     timeout: Number(this.timeout),
+        //     headers: {
+        //         'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
+        //         'Connection': 'Keep-Alive',
+        //         'Accept-Language': 'en-US,*',
+        //         'Content-Type': 'application/json',
+        //     },
+        //     json: {
+        //         "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
+        //     }
+        // };
+
+        // request.post(options, (error, response) => {
+        //     let statusCode = response?.statusCode
+        //     if (error) {
+        //         // logBad(`[DEAD] ==> ${proxy}`);
+        //         this.updateStatus(0, 1, proxy_type)
+        //     }
+        //     else if (statusCode == 201|| statusCode == 429 ) {
+        //         // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
+        //         this.updateStatus(1, 0, proxy_type)
+        //         this.proxiesSuccess.push(proxyObject)
+        //     } else {
+        //         // logBad(`[DEAD] ==> ${proxy}`);
+        //         this.updateStatus(0, 1, proxy_type)
+        //     }
+
+        //     if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
+        //     return
+        // });
 
         this.checked += 1;
 

@@ -117,7 +117,7 @@ class ProxyChecker {
                 'Content-Type': 'application/json',
             },
             json: {
-                "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
+                "email": "gunawanjae@outlook.es", "password": "xxx0996Sw@nny", "generate_holocron_token": true
             }
         };
 
