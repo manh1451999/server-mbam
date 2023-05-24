@@ -25,9 +25,23 @@ class ProxyChecker {
         this.resolve = null
         this.reject = null
         this.proxiesSuccess = []
+        this.cpm = 0
+        this.timerSyncCpm = null
+        this.timeCpm = Array(61).fill(0)
+    }
+    startCountCpm() {
+        this.timerSyncCpm = setInterval(() => {
+            const indexSecond = new Date().getSeconds()
+            this.timeCpm[indexSecond] = this.finished
+            this.cpm = this.finished - this.timeCpm[(indexSecond+1)%59]
+        }, 1000);
+    }
+    stopCountCpm(){
+        clearInterval(this.timerSyncCpm)
     }
 
     start() {
+        this.startCountCpm()
         return new Promise((resolve, reject) => {
             this.resolve = resolve
             this.reject = reject
@@ -60,6 +74,8 @@ class ProxyChecker {
         process.stdout.write(
             false ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc'
         );
+        console.log(`STATUS: ${this.finished}/${this.totalProxy}`)
+        console.log(`CPM: ${this.cpm}\n`)
         logSuccess('\nTOTAL WORKING: ' + this.working);
         logSuccess('HTTP: ' + this.http);
         logSuccess('SOCKS5: ' + this.socks5);
@@ -72,6 +88,7 @@ class ProxyChecker {
         if (this.finished >= this.totalProxy) {
             // console.log(chalk.hex('#388E3C')('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
             logSuccess('DONE !');
+            this.stopCountCpm()
             this.resolve(null)
         }
     }
@@ -89,6 +106,7 @@ class ProxyChecker {
     }
 
     check(proxyObject) {
+        try{
         // console.log('proxyObject', proxyObject)
         const { type: proxy_type, proxy } = proxyObject
         const options = {
@@ -116,44 +134,47 @@ class ProxyChecker {
             return
         });
 
-        
-        // const options = {
-        //     uri: 'https://my-sso.malwarebytes.com/auth',
-        //     method: 'POST',
-        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
-        //     timeout: Number(this.timeout),
-        //     headers: {
-        //         'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
-        //         'Connection': 'Keep-Alive',
-        //         'Accept-Language': 'en-US,*',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     json: {
-        //         "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
-        //     }
-        // };
+            // const options = {
+            //     uri: 'https://my-sso.malwarebytes.com/auth',
+            //     method: 'POST',
+            //     agent: new ProxyAgent(proxy_type + '://' + proxy),
+            //     timeout: Number(this.timeout),
+            //     headers: {
+            //         'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
+            //         'Connection': 'Keep-Alive',
+            //         'Accept-Language': 'en-US,*',
+            //         'Content-Type': 'application/json',
+            //     },
+            //     json: {
+            //         "email": "gunawanjae@outlook.es", "password": "xxx0996Sw@nny", "generate_holocron_token": true
+            //     }
+            // };
 
-        // request.post(options, (error, response) => {
-        //     let statusCode = response?.statusCode
-        //     if (error) {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
-        //     else if (statusCode == 201|| statusCode == 429 ) {
-        //         // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
-        //         this.updateStatus(1, 0, proxy_type)
-        //         this.proxiesSuccess.push(proxyObject)
-        //     } else {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
+            // request.post(options, (error, response) => {
+            //     let statusCode = response?.statusCode
+            //     if (error) {
+            //         // logBad(`[DEAD] ==> ${proxy}`);
+            //         this.updateStatus(0, 1, proxy_type)
+            //     }
+            //     else if (statusCode == 201 || statusCode == 429) {
+            //         // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
+            //         this.updateStatus(1, 0, proxy_type)
+            //         this.proxiesSuccess.push(proxyObject)
+            //     } else {
+            //         // logBad(`[DEAD] ==> ${proxy}`);
+            //         this.updateStatus(0, 1, proxy_type)
+            //     }
 
-        //     if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
-        //     return
-        // });
+            //     if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
+            //     return
+            // });
 
-        this.checked += 1;
-
+            // this.checked += 1;
+        } catch (err) {
+            console.log(err)
+            this.reject(err)
+            throw Error(err)
+        }
     }
 }
 

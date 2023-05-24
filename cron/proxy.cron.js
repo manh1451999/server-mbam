@@ -45,7 +45,7 @@ const checkProxy = async () => {
   console.log(`socks5: ${numberWithCommas(socks5.length)}`)
   console.log(`\n`)
   const options = {
-    timeout: 3000,
+    timeout: 4000,
     bot: 50
   }
   const proxies = [...http, ...socks4, ...socks5]
