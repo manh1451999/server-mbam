@@ -1,9 +1,9 @@
 var FULL_LINK = {
     JUPROXY: {
-        'https': ["https://www.juproxy.com/api?token=yXYKJmzslnxffEoGS2fJhLs6jCw5Zf1WXhcdQi4p&type=https"],
-        'http': ["https://www.juproxy.com/api?token=yXYKJmzslnxffEoGS2fJhLs6jCw5Zf1WXhcdQi4p&type=http"],
-        'socks4': ["https://www.juproxy.com/api?token=yXYKJmzslnxffEoGS2fJhLs6jCw5Zf1WXhcdQi4p&type=socks4"],
-        'socks5': ["https://www.juproxy.com/api?token=yXYKJmzslnxffEoGS2fJhLs6jCw5Zf1WXhcdQi4p&type=socks5"],
+        'https': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=https"],
+        'http': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=http"],
+        'socks4': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=socks4"],
+        'socks5': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=socks5"],
     },
 
     PROXY_SCAPPER: {

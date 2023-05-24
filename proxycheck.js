@@ -9,7 +9,7 @@ const args = process.argv.splice(2)
 const proxiesPlainText = fs.readFileSync(args[0], 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
 var proxies = proxiesPlainText.map(item => ({
     proxy: item,
-    type: 'http'
+    type: args[1] ||'http'
 }))
 //Return usage on lower then required argv length
 if (args.length < 1) return console.log(`Usage: node ${path.basename(__filename)} {proxies.txt} {timeout}`);
@@ -129,7 +129,7 @@ class ProxyChecker {
 const main = async () => {
     const options = {
         timeout: 4000,
-        bot: 20
+        bot: 50
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()
