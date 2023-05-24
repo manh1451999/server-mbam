@@ -61,7 +61,6 @@ proxyCron = () => {
   //   getProxyCache()
   // });
 
-  // autoPushProxyGit()
   checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()
