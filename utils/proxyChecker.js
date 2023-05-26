@@ -25,26 +25,69 @@ class ProxyChecker {
         this.resolve = null
         this.reject = null
         this.proxiesSuccess = []
+        this.cpm = 0
+        this.timerSyncCpm = null
+        this.timeCpm = Array(61).fill(0)
+    }
+    startCountCpm() {
+        this.timerSyncCpm = setInterval(() => {
+            const indexSecond = new Date().getSeconds()
+            this.timeCpm[indexSecond] = this.finished
+            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 59]
+        }, 1000);
+    }
+    stopCountCpm() {
+        clearInterval(this.timerSyncCpm)
+    }
+
+
+    title(text) {
+        if (process.platform === 'win32') {
+            process.title = text;
+        } else {
+            process.stdout.write('\x1b]2;' + text + '\x1b\x5c');
+        }
+    }
+
+    showInfo() {
+        // this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
+        console.clear()
+        process.stdout.write(
+            false ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc'
+        );
+        console.log(`STATUS: ${this.finished}/${this.totalProxy}`)
+        console.log(`CPM: ${this.cpm}\n`)
+        logSuccess('\nTOTAL WORKING: ' + this.working);
+        logSuccess('HTTP: ' + this.http);
+        logSuccess('SOCKS5: ' + this.socks5);
+        logSuccess('SOCKS4: ' + this.socks4);
+        logBad('\nTOTAL BAD: ' + this.not_working)
+        logBad('HTTP: ' + this.http_not_working);
+        logBad('SOCKS5: ' + this.socks5_not_working);
+        logBad('SOCKS4: ' + this.socks4_not_working);
     }
 
     start() {
+        this.startCountCpm()
         return new Promise((resolve, reject) => {
             this.resolve = resolve
             this.reject = reject
-            for (let i = 0; i < this.bot; i++) {
-                this.check(this.proxies[i])
+            this.bot = Math.min(this.totalProxy, this.bot)
+            console.log('this.bot', this.bot)
+            try {
+                for (let i = 0; i < this.bot; i++) {
+                    this.checkBasic(this.proxies[i])
+                    // this.checkConnectMbam(this.proxies[i])
+                }
+            } catch (err) {
+                console.log(err)
+                this.stopCountCpm()
+                this.reject(err)
             }
+
         })
     }
 
-
-    // title(text) {
-    //     if (process.platform === 'win32') {
-    //         process.title = text;
-    //     } else {
-    //         process.stdout.write('\x1b]2;' + text + '\x1b\x5c');
-    //     }
-    // }
 
     updateStatus(working, not_working, proxy_type) {
         this.working += working;
@@ -54,24 +97,11 @@ class ProxyChecker {
         this[`${proxy_type}_not_working`] += not_working;
 
         this.finished = this.not_working + this.working;
-
-        // this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
-        console.clear()
-        process.stdout.write(
-            false ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc'
-        );
-        logSuccess('\nTOTAL WORKING: ' + this.working);
-        logSuccess('HTTP: ' + this.http);
-        logSuccess('SOCKS5: ' + this.socks5);
-        logSuccess('SOCKS4: ' + this.socks4);
-        logBad('\nTOTAL BAD: ' + this.not_working)
-        logBad('HTTP: ' + this.http_not_working);
-        logBad('SOCKS5: ' + this.socks5_not_working);
-        logBad('SOCKS4: ' + this.socks4_not_working);
-        // console.log(chalk.hex('#388E3C')('\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
+        this.showInfo()
         if (this.finished >= this.totalProxy) {
-            // console.log(chalk.hex('#388E3C')('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
-            logSuccess('DONE !');
+            logSuccess('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working);
+            logSuccess('\n\nDONE !');
+            this.stopCountCpm()
             this.resolve(null)
         }
     }
@@ -88,8 +118,7 @@ class ProxyChecker {
         })
     }
 
-    check(proxyObject) {
-        // console.log('proxyObject', proxyObject)
+    checkBasic(proxyObject) {
         const { type: proxy_type, proxy } = proxyObject
         const options = {
             uri: 'http://example.com',
@@ -97,64 +126,132 @@ class ProxyChecker {
             agent: new ProxyAgent(proxy_type + '://' + proxy),
             timeout: Number(this.timeout)
         };
-
-        request.get(options, (error, response) => {
+        let checked = false
+        const req = request.get(options, (error, response) => {
+            if (checked) return;
+            checked = true
             if (error) {
-                // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
             else if (response.body.includes('Example')) {
-                // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
                 this.updateStatus(1, 0, proxy_type)
                 this.proxiesSuccess.push(proxyObject)
             } else {
-                // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
 
-            if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
+            if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
             return
         });
 
-        
-        // const options = {
-        //     uri: 'https://my-sso.malwarebytes.com/auth',
-        //     method: 'POST',
-        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
-        //     timeout: Number(this.timeout),
-        //     headers: {
-        //         'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
-        //         'Connection': 'Keep-Alive',
-        //         'Accept-Language': 'en-US,*',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     json: {
-        //         "email": "gunawanjae@outlook.es", "password": "0996Sw@nny", "generate_holocron_token": true
-        //     }
-        // };
 
-        // request.post(options, (error, response) => {
-        //     let statusCode = response?.statusCode
-        //     if (error) {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
-        //     else if (statusCode == 201|| statusCode == 429 ) {
-        //         // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
-        //         this.updateStatus(1, 0, proxy_type)
-        //         this.proxiesSuccess.push(proxyObject)
-        //     } else {
-        //         // logBad(`[DEAD] ==> ${proxy}`);
-        //         this.updateStatus(0, 1, proxy_type)
-        //     }
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req?.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
 
-        //     if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
-        //     return
-        // });
+        }, 10000)
 
         this.checked += 1;
 
     }
+
+    checkConnectMbam(proxyObject) {
+        const { type: proxy_type, proxy } = proxyObject
+
+        const options = {
+            uri: 'https://my-sso.malwarebytes.com',
+            method: 'GET',
+            agent: new ProxyAgent(proxy_type + '://' + proxy),
+            timeout: Number(this.timeout),
+            
+        };
+        let checked = false
+        const req = request.post(options, (error, response) => {
+            if (checked) return;
+            checked = true
+            let statusCode = response?.statusCode
+            if (error) {
+                this.updateStatus(0, 1, proxy_type)
+            }
+            else if (statusCode == 200 || statusCode == 429) {
+                this.updateStatus(1, 0, proxy_type)
+                this.proxiesSuccess.push(proxyObject)
+            } else {
+                this.updateStatus(0, 1, proxy_type)
+            }
+
+            if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
+            return
+        });
+
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
+
+        }, 10000)
+
+        this.checked += 1;
+
+    }
+
+    checkBanMbam(proxyObject) {
+        const { type: proxy_type, proxy } = proxyObject
+
+        const options = {
+            uri: 'https://my-sso.malwarebytes.com/auth',
+            method: 'POST',
+            agent: new ProxyAgent(proxy_type + '://' + proxy),
+            timeout: Number(this.timeout),
+            headers: {
+                'User-Agent': 'MBAM/4.3.0.98 (build: 1.0.1173; Windows 10.0.17763)',
+                'Connection': 'Keep-Alive',
+                'Accept-Language': 'en-US,*',
+                'Content-Type': 'application/json',
+            },
+            json: {
+                "email": "gunawanjae@outlook.es", "password": "xxx0996Sw@nny", "generate_holocron_token": true
+            }
+        };
+        let checked = false
+        const req = request.post(options, (error, response) => {
+            if (checked) return;
+            checked = true
+            let statusCode = response?.statusCode
+            if (error) {
+                this.updateStatus(0, 1, proxy_type)
+            }
+            else if (statusCode == 201 || statusCode == 429) {
+                this.updateStatus(1, 0, proxy_type)
+                this.proxiesSuccess.push(proxyObject)
+            } else {
+                this.updateStatus(0, 1, proxy_type)
+            }
+
+            if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
+            return
+        });
+
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
+
+        }, 10000)
+
+        this.checked += 1;
+
+    }
+
+
+
 }
 
 module.exports = {
