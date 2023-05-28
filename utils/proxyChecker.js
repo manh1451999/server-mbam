@@ -165,7 +165,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
@@ -207,7 +207,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
@@ -257,7 +257,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
