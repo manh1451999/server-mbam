@@ -9,3 +9,14 @@ module.exports.autoPushProxyGit = ()=>{
     });
     cmd.run('refresh');  // Refresh project
 }
+
+module.exports.autoPullProxyGit = ()=>{
+  if(process.env.AUTO_PUSH_GIT=='false') return;
+  console.log('node-cmd')
+    cmd.run('chmod 777 autoPullGit.sh'); /* :/ Fix no perms after updating */
+    cmd.run('sh autoPullGit.sh', (err, data) => {  // Run our script
+      if (data) console.log(data);
+      if (err) console.log(err);
+    });
+    cmd.run('refresh');  // Refresh project
+}
