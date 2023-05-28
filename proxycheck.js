@@ -6,13 +6,14 @@ const fs = require('fs-extra');
 const { TIMEOUT, BOT } = require('./config/proxyChecker');
 const { logSuccess, logBad, appendFile } = require('./utils');
 const args = process.argv.splice(2)
-const proxiesPlainText = fs.readFileSync(args[0], 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
-var proxies = proxiesPlainText.map(item => ({
+const typeProxy =  args[0] ||'http'
+const proxiesPlainText = fs.readFileSync(path.join('public', 'proxy-unchecked', typeProxy + '.txt'), 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
+var proxies = [...new Set(proxiesPlainText)].map(item => ({
     proxy: item,
-    type: args[1] ||'http'
+    type: typeProxy
 }))
 //Return usage on lower then required argv length
-if (args.length < 1) return console.log(`Usage: node ${path.basename(__filename)} {proxies.txt} {timeout}`);
+// if (args.length < 1) return console.log(`Usage: node ${path.basename(__filename)} {proxies.txt} {timeout}`);
 
 
 
@@ -44,7 +45,7 @@ class ProxyChecker {
         this.timerSyncCpm = setInterval(() => {
             const indexSecond = new Date().getSeconds()
             this.timeCpm[indexSecond] = this.finished
-            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 59]
+            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 60]
         }, 1000);
     }
     stopCountCpm() {
@@ -118,24 +119,33 @@ class ProxyChecker {
         }
     }
 
-    async saveToFile(pathFile = 'proxy') {
+    async saveToFile(pathFile = 'proxy', clear = true) {
         const pathParent = path.join('public', pathFile)
-        fs.emptyDirSync(pathParent)
         const dataWrite = {
-            http: '',
-            socks5: '',
-            socks4: '',
+            http: [],
+            socks5: [],
+            socks4: [],
         };
 
+        if(clear) fs.emptyDirSync(pathParent)
+        else {
+            Object.keys(dataWrite).forEach(type=>{
+                const pathOldFile = path.join(pathParent, type.toUpperCase() + '.txt')
+                if(fs.pathExistsSync(pathOldFile)) dataWrite[type] = fs.readFileSync(pathOldFile, 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
+            })
+        }
         this.proxiesSuccess.forEach(proxyObject => {
             const { proxy, type } = proxyObject
-            if(dataWrite[type] != undefined && proxy) dataWrite[type]+= proxy + '\n'
+            if(proxy) dataWrite[type].push(proxy)
         })
 
         for(const [type, data] of Object.entries(dataWrite)){
             const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
             try{
-                if(data) await appendFile(pathSaveFile, data)
+                if(data && data?.length) {
+                    const dataFormated =  [...new Set(data)].join('\n')
+                    await fs.outputFileSync(pathSaveFile, dataFormated)
+                }
             }catch(err){
                 console.log('err', err)
             }
@@ -281,11 +291,12 @@ class ProxyChecker {
 const main = async () => {
     const options = {
         timeout: 4000,
-        bot: 50
+        bot: 70
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()
-    await checker.saveToFile()
+    await checker.saveToFile('proxy-static', false)
+    await checker.saveToFile('proxy', false)
     process.exit(0)
 }
 main()

@@ -33,7 +33,7 @@ class ProxyChecker {
         this.timerSyncCpm = setInterval(() => {
             const indexSecond = new Date().getSeconds()
             this.timeCpm[indexSecond] = this.finished
-            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 59]
+            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 60]
         }, 1000);
     }
     stopCountCpm() {
@@ -107,24 +107,33 @@ class ProxyChecker {
         }
     }
 
-    async saveToFile(pathFile = 'proxy') {
+    async saveToFile(pathFile = 'proxy', clear = true) {
         const pathParent = path.join('public', pathFile)
-        fs.emptyDirSync(pathParent)
         const dataWrite = {
-            http: '',
-            socks5: '',
-            socks4: '',
+            http: [],
+            socks5: [],
+            socks4: [],
         };
 
+        if(clear) fs.emptyDirSync(pathParent)
+        else {
+            Object.keys(dataWrite).forEach(type=>{
+                const pathOldFile = path.join(pathParent, type.toUpperCase() + '.txt')
+                if(fs.pathExistsSync(pathOldFile)) dataWrite[type] = fs.readFileSync(pathOldFile, 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
+            })
+        }
         this.proxiesSuccess.forEach(proxyObject => {
             const { proxy, type } = proxyObject
-            if(dataWrite[type] != undefined && proxy) dataWrite[type]+= proxy + '\n'
+            if(proxy) dataWrite[type].push(proxy)
         })
 
         for(const [type, data] of Object.entries(dataWrite)){
             const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
             try{
-                if(data) await appendFile(pathSaveFile, data)
+                if(data && data?.length) {
+                    const dataFormated =  [...new Set(data)].join('\n')
+                    await fs.outputFileSync(pathSaveFile, dataFormated)
+                }
             }catch(err){
                 console.log('err', err)
             }
