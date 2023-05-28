@@ -55,9 +55,9 @@ const checkProxy = async () => {
   }
   const proxies = [...http, ...socks4, ...socks5]
   const checker = new ProxyChecker(proxies, options);
-  autoPullProxyGit()
   await checker.start()
-  checker.saveToFile()
+  await checker.saveToFile()
+  autoPullProxyGit()
   autoPushProxyGit()
 }
 
