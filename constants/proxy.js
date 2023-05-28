@@ -12,6 +12,15 @@ var FULL_LINK = {
         'socks4': ["https://api.proxyscrape.com/v2/?request=getproxies&timeout=10000&country=all&ssl=all&anonymity=all&protocol=socks4"],
         'socks5': ["https://api.proxyscrape.com/v2/?request=getproxies&timeout=10000&country=all&ssl=all&anonymity=all&protocol=socks5"],
     },
+    MONOSANS: {
+        'http': ['https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt'],
+        'socks4': ['https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks4.txt'],
+        'socks5': ['https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt'],
+
+    },
+    MERTGUVENCLI: {
+        'http': ["https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt"],
+    },
     TELEGRAM: {
         'http': ["http://client234.xdlcloud.ir/Join-Telegram%3E@TeamDemon.php"],
     },
@@ -55,10 +64,10 @@ const mergeLink = (type, listSite = []) => {
 }
 
 FULL_LINK.AUTO_CHECK = {
-    'http': mergeLink('http', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+    'http': mergeLink('http', ['PROXY_SCAPPER', 'MONOSANS', 'MERTGUVENCLI', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
     'https': mergeLink('https', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks4': mergeLink('socks4', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks5': mergeLink('socks5', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+    'socks4': mergeLink('socks4', ['PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+    'socks5': mergeLink('socks5', ['PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
 }
 
 // FULL_LINK.AUTO_CHECK = {

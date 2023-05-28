@@ -3,7 +3,7 @@ const request = require('request')
 const path = require('path')
 const fs = require('fs-extra');
 const { TIMEOUT, BOT } = require('../config/proxyChecker');
-const { logSuccess, logBad } = require('.');
+const { logSuccess, logBad, appendFile } = require('.');
 
 class ProxyChecker {
     constructor(proxies, options) {
@@ -67,7 +67,8 @@ class ProxyChecker {
         logBad('SOCKS4: ' + this.socks4_not_working);
     }
 
-    start() {
+    start(type='checkBasic') {
+        if(!this[type]) throw Error("type must one of ['checkBasic', 'checkConnectMbam', 'checkBanMbam']")
         this.startCountCpm()
         return new Promise((resolve, reject) => {
             this.resolve = resolve
@@ -76,7 +77,7 @@ class ProxyChecker {
             console.log('this.bot', this.bot)
             try {
                 for (let i = 0; i < this.bot; i++) {
-                    this.checkBasic(this.proxies[i])
+                    this[type](this.proxies[i])
                     // this.checkConnectMbam(this.proxies[i])
                 }
             } catch (err) {
@@ -106,16 +107,28 @@ class ProxyChecker {
         }
     }
 
-    saveToFile(pathFile = 'proxy') {
+    async saveToFile(pathFile = 'proxy') {
         const pathParent = path.join('public', pathFile)
         fs.emptyDirSync(pathParent)
+        const dataWrite = {
+            http: '',
+            socks5: '',
+            socks4: '',
+        };
+
         this.proxiesSuccess.forEach(proxyObject => {
             const { proxy, type } = proxyObject
-            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
-            fs.appendFile(pathSaveFile, proxy + '\n', (err) => {
-                if (err) throw err;
-            })
+            if(dataWrite[type] != undefined && proxy) dataWrite[type]+= proxy + '\n'
         })
+
+        for(const [type, data] of Object.entries(dataWrite)){
+            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
+            try{
+                if(data) await appendFile(pathSaveFile, data)
+            }catch(err){
+                console.log('err', err)
+            }
+        }
     }
 
     checkBasic(proxyObject) {

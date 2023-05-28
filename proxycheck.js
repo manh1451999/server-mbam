@@ -4,7 +4,7 @@ const chalk = require('chalk')
 const path = require('path')
 const fs = require('fs-extra');
 const { TIMEOUT, BOT } = require('./config/proxyChecker');
-const { logSuccess, logBad } = require('./utils');
+const { logSuccess, logBad, appendFile } = require('./utils');
 const args = process.argv.splice(2)
 const proxiesPlainText = fs.readFileSync(args[0], 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
 var proxies = proxiesPlainText.map(item => ({
@@ -13,6 +13,8 @@ var proxies = proxiesPlainText.map(item => ({
 }))
 //Return usage on lower then required argv length
 if (args.length < 1) return console.log(`Usage: node ${path.basename(__filename)} {proxies.txt} {timeout}`);
+
+
 
 class ProxyChecker {
     constructor(proxies, options) {
@@ -34,16 +36,19 @@ class ProxyChecker {
         this.resolve = null
         this.reject = null
         this.proxiesSuccess = []
+        this.cpm = 0
+        this.timerSyncCpm = null
+        this.timeCpm = Array(61).fill(0)
     }
-
-    start() {
-        return new Promise((resolve, reject) => {
-            this.resolve = resolve
-            this.reject = reject
-            for (let i = 0; i < this.bot; i++) {
-                this.check(proxies[i])
-            }
-        })
+    startCountCpm() {
+        this.timerSyncCpm = setInterval(() => {
+            const indexSecond = new Date().getSeconds()
+            this.timeCpm[indexSecond] = this.finished
+            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 59]
+        }, 1000);
+    }
+    stopCountCpm() {
+        clearInterval(this.timerSyncCpm)
     }
 
 
@@ -55,17 +60,14 @@ class ProxyChecker {
         }
     }
 
-    updateStatus(working, not_working, proxy_type) {
-        this.working += working;
-        this[proxy_type] += working;
-
-        this.not_working += not_working;
-        this[`${proxy_type}_not_working`] += not_working;
-
-        this.finished = this.not_working + this.working;
-
-        this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
+    showInfo() {
+        // this.title(`ALIVE: ${this.working}/${this.totalProxy} | CHECK: ${this.finished}`);
         console.clear()
+        process.stdout.write(
+            false ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc'
+        );
+        console.log(`STATUS: ${this.finished}/${this.totalProxy}`)
+        console.log(`CPM: ${this.cpm}\n`)
         logSuccess('\nTOTAL WORKING: ' + this.working);
         logSuccess('HTTP: ' + this.http);
         logSuccess('SOCKS5: ' + this.socks5);
@@ -74,36 +76,156 @@ class ProxyChecker {
         logBad('HTTP: ' + this.http_not_working);
         logBad('SOCKS5: ' + this.socks5_not_working);
         logBad('SOCKS4: ' + this.socks4_not_working);
-        // console.log(chalk.hex('#388E3C')('\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
-        if (this.finished >= this.totalProxy) {
-            // console.log(chalk.hex('#388E3C')('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working));
-            logSuccess('DONE !');
-            this.resolve()
-        }
     }
 
-    saveToFile(pathFile = 'proxy') {
-        const pathParent = path.join('public', pathFile)
-        fs.emptyDirSync(pathParent)
-        this.proxiesSuccess.forEach(proxyObject => {
-            const { proxy, type } = proxyObject
-            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
-            fs.appendFile(pathSaveFile, proxy + '\n', (err) => {
-                if (err) throw err;
-            })
+    start(type='checkBasic') {
+        if(!this[type]) throw Error("type must one of ['checkBasic', 'checkConnectMbam', 'checkBanMbam']")
+        this.startCountCpm()
+        return new Promise((resolve, reject) => {
+            this.resolve = resolve
+            this.reject = reject
+            this.bot = Math.min(this.totalProxy, this.bot)
+            console.log('this.bot', this.bot)
+            try {
+                for (let i = 0; i < this.bot; i++) {
+                    this[type](this.proxies[i])
+                    // this.checkConnectMbam(this.proxies[i])
+                }
+            } catch (err) {
+                console.log(err)
+                this.stopCountCpm()
+                this.reject(err)
+            }
+
         })
     }
 
-    check(proxyObject) {
-        // console.log('proxyObject', proxyObject)
-        if (!proxyObject) return;
-        const { type: proxy_type, proxy = [] } = proxyObject
-        // const options = {
-        //     uri: 'http://example.com',
-        //     method: 'GET',
-        //     agent: new ProxyAgent(proxy_type + '://' + proxy),
-        //     timeout: Number(this.timeout)
-        // };
+
+    updateStatus(working, not_working, proxy_type) {
+        this.working += working;
+        this[proxy_type] += working;
+
+        this.not_working += not_working;
+        this[`${proxy_type}_not_working`] += not_working;
+
+        this.finished = this.not_working + this.working;
+        this.showInfo()
+        if (this.finished >= this.totalProxy) {
+            logSuccess('DONE !\nWORKING: ' + this.working + '\nBAD: ' + this.not_working);
+            logSuccess('\n\nDONE !');
+            this.stopCountCpm()
+            this.resolve(null)
+        }
+    }
+
+    async saveToFile(pathFile = 'proxy') {
+        const pathParent = path.join('public', pathFile)
+        fs.emptyDirSync(pathParent)
+        const dataWrite = {
+            http: '',
+            socks5: '',
+            socks4: '',
+        };
+
+        this.proxiesSuccess.forEach(proxyObject => {
+            const { proxy, type } = proxyObject
+            if(dataWrite[type] != undefined && proxy) dataWrite[type]+= proxy + '\n'
+        })
+
+        for(const [type, data] of Object.entries(dataWrite)){
+            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
+            try{
+                if(data) await appendFile(pathSaveFile, data)
+            }catch(err){
+                console.log('err', err)
+            }
+        }
+    }
+
+    checkBasic(proxyObject) {
+        const { type: proxy_type, proxy } = proxyObject
+        const options = {
+            uri: 'http://example.com',
+            method: 'GET',
+            agent: new ProxyAgent(proxy_type + '://' + proxy),
+            timeout: Number(this.timeout)
+        };
+        let checked = false
+        const req = request.get(options, (error, response) => {
+            if (checked) return;
+            checked = true
+            if (error) {
+                this.updateStatus(0, 1, proxy_type)
+            }
+            else if (response.body.includes('Example')) {
+                this.updateStatus(1, 0, proxy_type)
+                this.proxiesSuccess.push(proxyObject)
+            } else {
+                this.updateStatus(0, 1, proxy_type)
+            }
+
+            if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
+            return
+        });
+
+
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req?.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
+
+        }, Number(this.timeout+ 3000))
+
+        this.checked += 1;
+
+    }
+
+    checkConnectMbam(proxyObject) {
+        const { type: proxy_type, proxy } = proxyObject
+
+        const options = {
+            uri: 'https://my-sso.malwarebytes.com',
+            method: 'GET',
+            agent: new ProxyAgent(proxy_type + '://' + proxy),
+            timeout: Number(this.timeout),
+            
+        };
+        let checked = false
+        const req = request.post(options, (error, response) => {
+            if (checked) return;
+            checked = true
+            let statusCode = response?.statusCode
+            if (error) {
+                this.updateStatus(0, 1, proxy_type)
+            }
+            else if (statusCode == 200 || statusCode == 429) {
+                this.updateStatus(1, 0, proxy_type)
+                this.proxiesSuccess.push(proxyObject)
+            } else {
+                this.updateStatus(0, 1, proxy_type)
+            }
+
+            if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
+            return
+        });
+
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
+
+        }, Number(this.timeout+ 3000))
+
+        this.checked += 1;
+
+    }
+
+    checkBanMbam(proxyObject) {
+        const { type: proxy_type, proxy } = proxyObject
 
         const options = {
             uri: 'https://my-sso.malwarebytes.com/auth',
@@ -120,31 +242,42 @@ class ProxyChecker {
                 "email": "gunawanjae@outlook.es", "password": "xxx0996Sw@nny", "generate_holocron_token": true
             }
         };
-
-        request.post(options, (error, response) => {
+        let checked = false
+        const req = request.post(options, (error, response) => {
+            if (checked) return;
+            checked = true
             let statusCode = response?.statusCode
             if (error) {
-                // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
-            else if (statusCode == 201|| statusCode == 429 ) {
-                // logSuccess(`[${proxy_type.toUpperCase()}] ==> ${proxy}`);
+            else if (statusCode == 201 || statusCode == 429) {
                 this.updateStatus(1, 0, proxy_type)
                 this.proxiesSuccess.push(proxyObject)
             } else {
-                // logBad(`[DEAD] ==> ${proxy}`);
                 this.updateStatus(0, 1, proxy_type)
             }
-            console.log('statusCode', statusCode)
 
-            if (this.checked < this.totalProxy) this.check(this.proxies[this.checked])
+            if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
             return
         });
+
+        setTimeout(() => {
+            if (checked) return;
+            checked = true
+            req.destroy()
+            this.updateStatus(0, 1, proxy_type)
+            if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
+
+        }, Number(this.timeout+ 3000))
 
         this.checked += 1;
 
     }
+
+
+
 }
+
 const main = async () => {
     const options = {
         timeout: 4000,
@@ -152,6 +285,7 @@ const main = async () => {
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()
-    checker.saveToFile()
+    await checker.saveToFile()
+    process.exit(0)
 }
 main()
