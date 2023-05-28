@@ -31,13 +31,18 @@ const checkProxy = async () => {
     getProxy('AUTO_CHECK', 'socks5', false),
   ])
   console.log('done!')
+
+  // before remove duplicate
+  // console.log(`total: ${numberWithCommas(http.length + socks4.length + socks5.length)}`)
+  // console.log(`http: ${numberWithCommas(http.length+ https.length)}`)
+  // console.log(`socks4: ${numberWithCommas(socks4.length)}`)
+  // console.log(`socks5: ${numberWithCommas(socks5.length)}`)
+  // return;
+
+
   http = [...new Set([...http, ...https])].map(proxy => ({ type: 'http', proxy }))
   socks4 = [...new Set(socks4)].map(proxy => ({ type: 'socks4', proxy }))
   socks5 = [...new Set(socks5)].map(proxy => ({ type: 'socks5', proxy }))
-
-  // http = [...http, ...https].map(proxy => ({ type: 'http', proxy }))
-  // socks4 = [...socks4].map(proxy => ({ type: 'socks4', proxy }))
-  // socks5 = [...socks5].map(proxy => ({ type: 'socks5', proxy }))
 
   console.log(`total: ${numberWithCommas(http.length + socks4.length + socks5.length)}`)
   console.log(`http: ${numberWithCommas(http.length)}`)
@@ -60,7 +65,7 @@ proxyCron = () => {
   // cron.schedule('*/5 * * * * ', () => {
   //   getProxyCache()
   // });
-
+  if(process.env.PROXY_CRON=='false') return;
   checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()
