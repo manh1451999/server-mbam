@@ -113,7 +113,13 @@ module.exports.deleteFileFromPath = (path) => {
     }
 }
 
+module.exports.stringToBoolean = (str) => {
+    if(!str) return false
+     return (String(str).toLowerCase() === 'true');
+}
+
 const capitalizeFirstLetter = (string) => {
     return string.trim().split(" ").map(item => item[0].toUpperCase() + item.slice(1).toLowerCase()).join(" ")
 }
+
 
