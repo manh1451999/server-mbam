@@ -67,7 +67,7 @@ proxyCron = () => {
   //   getProxyCache()
   // });
   if(process.env.PROXY_CRON=='false') return;
-  checkProxy()
+  // checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()
   });
