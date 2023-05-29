@@ -56,8 +56,8 @@ const checkProxy = async () => {
   const proxies = [...http, ...socks4, ...socks5]
   const checker = new ProxyChecker(proxies, options);
   await checker.start()
-  await checker.saveToFile()
   autoPullProxyGit()
+  await checker.saveToFile()
   autoPushProxyGit()
 }
 
@@ -67,7 +67,7 @@ proxyCron = () => {
   //   getProxyCache()
   // });
   if(process.env.PROXY_CRON=='false') return;
-  checkProxy()
+  // checkProxy()
   cron.schedule('0 */2 * * *', () => {
     checkProxy()
   });

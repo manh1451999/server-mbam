@@ -16,6 +16,7 @@ var proxyFreeRouters = require('./routes/proxy.route')
 var mailRouters = require('./routes/mail.route');
 const { default: axios } = require('axios');
 const { proxyCron } = require('./cron/proxy.cron');
+const { stringToBoolean } = require('./utils');
 
 
 
@@ -69,4 +70,4 @@ if (env == 'development') {
   });
 } 
 
-proxyCron()
+if(stringToBoolean(process.env.AUTO_CHECK_PROXY)) proxyCron()
