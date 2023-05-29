@@ -19,6 +19,25 @@ module.exports.numberWithCommas = (number, commas='.') =>{
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, commas);
 }
 
+
+module.exports.appendFile= (pathSaveFile, data) =>{
+    return new Promise((resolve, reject)=>{
+        fs.appendFile(pathSaveFile, data, (err) => {
+            if (err) throw reject(err);
+            resolve(data)
+        })
+    })
+}
+
+module.exports.appendProxy= (pathSaveFile, proxy) =>{
+    return new Promise((resolve, reject)=>{
+        fs.appendFile(pathSaveFile, proxy + '\n', (err) => {
+            if (err) throw reject(err);
+            resolve(proxy + '\n')
+        })
+    })
+}
+
 module.exports.getNameRandom = () => {
     let max = LIST_RANDOM_NAME.length - 1
     let index = Math.floor(Math.random() * (max + 1));

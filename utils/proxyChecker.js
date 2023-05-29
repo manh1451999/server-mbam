@@ -3,7 +3,7 @@ const request = require('request')
 const path = require('path')
 const fs = require('fs-extra');
 const { TIMEOUT, BOT } = require('../config/proxyChecker');
-const { logSuccess, logBad } = require('.');
+const { logSuccess, logBad, appendFile } = require('.');
 
 class ProxyChecker {
     constructor(proxies, options) {
@@ -33,7 +33,7 @@ class ProxyChecker {
         this.timerSyncCpm = setInterval(() => {
             const indexSecond = new Date().getSeconds()
             this.timeCpm[indexSecond] = this.finished
-            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 59]
+            this.cpm = this.finished - this.timeCpm[(indexSecond + 1) % 60]
         }, 1000);
     }
     stopCountCpm() {
@@ -67,7 +67,8 @@ class ProxyChecker {
         logBad('SOCKS4: ' + this.socks4_not_working);
     }
 
-    start() {
+    start(type='checkBasic') {
+        if(!this[type]) throw Error("type must one of ['checkBasic', 'checkConnectMbam', 'checkBanMbam']")
         this.startCountCpm()
         return new Promise((resolve, reject) => {
             this.resolve = resolve
@@ -76,7 +77,7 @@ class ProxyChecker {
             console.log('this.bot', this.bot)
             try {
                 for (let i = 0; i < this.bot; i++) {
-                    this.checkBasic(this.proxies[i])
+                    this[type](this.proxies[i])
                     // this.checkConnectMbam(this.proxies[i])
                 }
             } catch (err) {
@@ -106,16 +107,37 @@ class ProxyChecker {
         }
     }
 
-    saveToFile(pathFile = 'proxy') {
+    async saveToFile(pathFile = 'proxy', clear = true) {
         const pathParent = path.join('public', pathFile)
-        fs.emptyDirSync(pathParent)
+        const dataWrite = {
+            http: [],
+            socks5: [],
+            socks4: [],
+        };
+
+        if(clear) fs.emptyDirSync(pathParent)
+        else {
+            Object.keys(dataWrite).forEach(type=>{
+                const pathOldFile = path.join(pathParent, type.toUpperCase() + '.txt')
+                if(fs.pathExistsSync(pathOldFile)) dataWrite[type] = fs.readFileSync(pathOldFile, 'utf-8').replace(/\r/g, '').split('\n').filter(Boolean);
+            })
+        }
         this.proxiesSuccess.forEach(proxyObject => {
             const { proxy, type } = proxyObject
-            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
-            fs.appendFile(pathSaveFile, proxy + '\n', (err) => {
-                if (err) throw err;
-            })
+            if(proxy) dataWrite[type].push(proxy)
         })
+
+        for(const [type, data] of Object.entries(dataWrite)){
+            const pathSaveFile = path.join(pathParent, type.toUpperCase() + '.txt')
+            try{
+                if(data && data?.length) {
+                    const dataFormated =  [...new Set(data)].join('\n')
+                    await fs.outputFileSync(pathSaveFile, dataFormated)
+                }
+            }catch(err){
+                console.log('err', err)
+            }
+        }
     }
 
     checkBasic(proxyObject) {
@@ -152,7 +174,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkBasic(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
@@ -194,7 +216,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkConnectMbam(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
@@ -244,7 +266,7 @@ class ProxyChecker {
             this.updateStatus(0, 1, proxy_type)
             if (this.checked < this.totalProxy) this.checkBanMbam(this.proxies[this.checked])
 
-        }, 10000)
+        }, Number(this.timeout+ 2000))
 
         this.checked += 1;
 
