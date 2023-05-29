@@ -58,7 +58,9 @@ const checkProxy = async () => {
   await checker.start()
   autoPullProxyGit()
   await checker.saveToFile()
-  autoPushProxyGit()
+  setTimeout(() => { 
+    autoPushProxyGit()
+   }, 3000)
 }
 
 proxyCron = () => {
