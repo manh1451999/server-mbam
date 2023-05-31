@@ -291,7 +291,7 @@ class ProxyChecker {
 const main = async () => {
     const options = {
         timeout: 4000,
-        bot: 50
+        bot: 70
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()

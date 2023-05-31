@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "prod": "SET NODE_ENV=production & node app.js",
-    "dev": "nodemon --inspect app.js"
+    "dev": "nodemon --inspect app.js",
+    "http": "node proxycheck.js http",
+    "socks4": "node proxycheck.js socks4",
+    "socks5": "node proxycheck.js socks5"
   },
   "author": "manh yellow",
   "license": "ISC",
