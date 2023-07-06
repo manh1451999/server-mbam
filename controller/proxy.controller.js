@@ -24,7 +24,8 @@ const getProxy = async (category, type, useCache= true) =>{
 		// console.log(`Cache ===> get ${proxies.split('\n').length} from ${key}`)
 		return proxiesCache
 	}
-	proxies = proxies || []
+	proxies = [...new Set(proxies || [])]
+	
 	setCache(key, proxies)
 	return proxies
 }

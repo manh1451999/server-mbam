@@ -79,6 +79,13 @@ FULL_LINK.AUTO_CHECK = {
     'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
 }
 
+
+FULL_LINK.SCAN = {
+    'http': mergeLink('http', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
+    'socks4': mergeLink('socks4', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
+    'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
+}
+
 // FULL_LINK.AUTO_CHECK = {
 //     'http': mergeLink('http', ['PROXY_SCAPPER']),
 //     'https':[],
