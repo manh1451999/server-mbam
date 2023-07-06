@@ -258,7 +258,7 @@ class ProxyChecker {
             checked = true
             let statusCode = response?.statusCode
             if (error) {
-                this.updateStatus(0, 1, proxy_type)
+                // this.updateStatus(0, 1, proxy_type)
             }
             else if (statusCode == 201 || statusCode == 429) {
                 this.updateStatus(1, 0, proxy_type)
@@ -291,7 +291,7 @@ class ProxyChecker {
 const main = async () => {
     const options = {
         timeout: 4000,
-        bot: 70
+        bot: 30
     }
     const checker = new ProxyChecker(proxies, options);
     await checker.start()
