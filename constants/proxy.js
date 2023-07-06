@@ -5,12 +5,12 @@ var FULL_LINK = {
         'socks4': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=socks4"],
         'socks5': ["https://www.juproxy.com/api?token=qSZJgl4ojbao7BIUPh2Y8r6JRtXTzfAOLXkl44qy&type=socks5"],
     },
-    SERVER_MBAM:{
+    SERVER_MBAM: {
         'http': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy/HTTP.txt"],
         'socks4': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy/SOCKS4.txt"],
         'socks5': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy/SOCKS5.txt"],
     },
-    SERVER_MBAM_STATIC:{
+    SERVER_MBAM_STATIC: {
         'http': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy-static/HTTP.txt"],
         'socks4': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy-static/SOCKS4.txt"],
         'socks5': ["https://raw.githubusercontent.com/manh1451999/server-mbam/master/public/proxy-static/SOCKS5.txt"],
@@ -73,17 +73,25 @@ const mergeLink = (type, listSite = []) => {
 }
 
 FULL_LINK.AUTO_CHECK = {
-    'http': mergeLink('http', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'MERTGUVENCLI', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'https': mergeLink('https', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks4': mergeLink('socks4', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
-    'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'THE_SPEEDX', 'OPENPROXYLIST_XYZ']),
+    'http': mergeLink('http', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'MERTGUVENCLI', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'OPENPROXYLIST_XYZ']),
+    'https': mergeLink('https', ['PROXY_SCAPPER', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'OPENPROXYLIST_XYZ']),
+    'socks4': mergeLink('socks4', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'OPENPROXYLIST_XYZ']),
+    'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER', 'MONOSANS', 'TELEGRAM', 'MANU_GMG', 'HOOKZOF', 'MMPX12', 'ROOSTERKID_OPENPROXYLIST', 'SHIFTY', 'OPENPROXYLIST_XYZ']),
+}
+
+
+FULL_LINK.TEST = {
+    'http': mergeLink('http', ['THE_SPEEDX']),
+    'https': mergeLink('https', ['THE_SPEEDX']),
+    'socks4': mergeLink('socks4', ['THE_SPEEDX']),
+    'socks5': mergeLink('socks5', ['THE_SPEEDX']),
 }
 
 
 FULL_LINK.SCAN = {
-    'http': mergeLink('http', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
-    'socks4': mergeLink('socks4', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
-    'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC']),
+    'http': mergeLink('http', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER']),
+    'socks4': mergeLink('socks4', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER']),
+    'socks5': mergeLink('socks5', ['SERVER_MBAM', 'SERVER_MBAM_STATIC', 'PROXY_SCAPPER']),
 }
 
 // FULL_LINK.AUTO_CHECK = {
